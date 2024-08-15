@@ -3,10 +3,10 @@ package lexer
 import "luederlang/token"
 
 type Lexer struct {
-    input string
-    position int
-    readPosition int
-    ch byte
+    input           string
+    position        int
+    readPosition    int
+    ch              byte
 }
 
 func New(input string) *Lexer {
@@ -15,7 +15,7 @@ func New(input string) *Lexer {
     return l
 }
 
-func (l *Lexer) nextToken() token.Token {
+func (l *Lexer) NextToken() token.Token {
     var tok token.Token
 
     l.eatWhitespace()
@@ -35,7 +35,14 @@ func (l *Lexer) nextToken() token.Token {
     case '-':
         tok = newToken(token.MINUS, l.ch)
     case '!':
-        tok = newToken(token.BANG, l.ch)
+        if l.peekChar() == '=' {
+            ch := l.ch
+            l.readChar()
+            literal := string(ch) + string(l.ch)
+            tok = token.Token{Type: token.NOT_EQ, Literal: literal}
+        } else {
+            tok = newToken(token.BANG, l.ch)
+        }
     case '/':
         tok = newToken(token.SLASH, l.ch)
     case '*':

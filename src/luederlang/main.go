@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+    "luederlang/repl"
+    "os"
 	"os/user"
 )
 
@@ -10,7 +12,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Hello %s! This is the Monkey programming language!\n",
+	fmt.Printf("Hello %s! This is the Luederlang programming language!\n",
 		user.Username)
 	fmt.Printf("Feel free to type in commands\n")
+	repl.Start(os.Stdin, os.Stdout)
 }
