@@ -1,5 +1,9 @@
 package token
 
+import (
+    "strings"
+)
+
 type TokenType string
 
 const (
@@ -9,6 +13,7 @@ const (
 	// Identifiers + literals
 	IDENT = "IDENT" // add, foobar, x, y, ...
 	INT   = "INT"   // 1343456
+    FLOAT = "FLOAT"
 
 	// Operators
 	ASSIGN   = "="
@@ -63,4 +68,18 @@ func LookupIdent(ident string) TokenType {
 		return tok
 	}
 	return IDENT
+}
+
+func LookupNumber(number string) TokenType {
+    count := strings.Count(number, ".")
+    var tok TokenType
+    switch count {
+    case 0:
+        tok = INT
+    case 1:
+        tok = FLOAT
+    default:
+        tok = ILLEGAL
+    }
+    return tok
 }

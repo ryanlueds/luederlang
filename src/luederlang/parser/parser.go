@@ -55,7 +55,8 @@ func New(l *lexer.Lexer) *Parser {
 
     p.prefixParseFns = make(map[token.TokenType]prefixParseFn)
     p.registerPrefix(token.IDENT, p.parseIdentifier)
-    p.registerPrefix(token.INT, p.parseNumberLiteral)
+    p.registerPrefix(token.INT, p.parseIntLiteral)
+    p.registerPrefix(token.FLOAT, p.parseFloatLiteral)
     p.registerPrefix(token.BANG, p.parsePrefixExpression)
     p.registerPrefix(token.MINUS, p.parsePrefixExpression)
     p.registerPrefix(token.TRUE, p.parseBoolean)
@@ -93,6 +94,10 @@ func (p *Parser) registerInfix(tokenType token.TokenType, fn infixParseFn) {
 func (p *Parser) nextToken() {
 	p.curToken = p.peekToken
 	p.peekToken = p.l.NextToken()
+    
+    if (p.curToken.Type == token.ILLEGAL || p.peekToken.Type == token.ILLEGAL) {
+        p.illegalTokenError()
+    }
 }
 
 func (p *Parser) curTokenIs(t token.TokenType) bool {
@@ -125,6 +130,11 @@ func (p *Parser) peekError(t token.TokenType) {
 
 func (p *Parser) noPrefixParseFnError(t token.TokenType) {
 	msg := fmt.Sprintf("no prefix parse function for %s found", t)
+	p.errors = append(p.errors, msg)
+}
+
+func (p *Parser) illegalTokenError() {
+	msg := fmt.Sprintf("illegal token found")
 	p.errors = append(p.errors, msg)
 }
 
@@ -257,11 +267,27 @@ func (p *Parser) parseIdentifier() ast.Expression {
 	return &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 }
 
-func (p *Parser) parseNumberLiteral() ast.Expression {
+func (p *Parser) parseIntLiteral() ast.Expression {
     // TODO: parse floats here
 	lit := &ast.IntegerLiteral{Token: p.curToken}
 
 	value, err := strconv.ParseInt(p.curToken.Literal, 0, 64)
+	if err != nil {
+		msg := fmt.Sprintf("could not parse %q as integer", p.curToken.Literal)
+		p.errors = append(p.errors, msg)
+		return nil
+	}
+
+	lit.Value = value
+
+	return lit
+}
+
+func (p *Parser) parseFloatLiteral() ast.Expression {
+    // TODO: parse floats here
+	lit := &ast.FloatLiteral{Token: p.curToken}
+
+	value, err := strconv.ParseFloat(p.curToken.Literal, 64)
 	if err != nil {
 		msg := fmt.Sprintf("could not parse %q as integer", p.curToken.Literal)
 		p.errors = append(p.errors, msg)
