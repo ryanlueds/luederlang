@@ -16,6 +16,8 @@ const (
     BOOLEAN_OBJ = "BOOLEAN"
     FLOAT_OBJ = "FLOAT"
     NULL_OBJ = "NULL"
+    STRING_OBJ = "STRING"
+    LIST_OBJ = "LIST"
 )
 
 type Integer struct {
