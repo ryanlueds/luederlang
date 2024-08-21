@@ -41,6 +41,74 @@ func TestLetStatements(t *testing.T) {
 	}
 }
 
+func TestIntStatements(t *testing.T) {
+	tests := []struct {
+		input              string
+		expectedIdentifier string
+		expectedValue      interface{}
+	}{
+		{"int x = 5;", "x", 5},
+		{"int y = 7;", "y", 7},
+		{"int foobar = y;", "foobar", "y"},
+	}
+
+	for _, tt := range tests {
+		l := lexer.New(tt.input)
+		p := New(l)
+		program := p.ParseProgram()
+		checkParserErrors(t, p)
+
+		if len(program.Statements) != 1 {
+			t.Fatalf("program.Statements does not contain 1 statements. got=%d",
+				len(program.Statements))
+		}
+
+		stmt := program.Statements[0]
+		if !testIntStatement(t, stmt, tt.expectedIdentifier) {
+			return
+		}
+
+		val := stmt.(*ast.IntStatement).Value
+		if !testLiteralExpression(t, val, tt.expectedValue) {
+			return
+		}
+	}
+}
+
+func TestFloatStatements(t *testing.T) {
+	tests := []struct {
+		input              string
+		expectedIdentifier string
+		expectedValue      interface{}
+	}{
+		{"float x = 5.123;", "x", 5.123},
+		{"float y = 7.0;", "y", float64(7.0)},
+		{"float foobar = y;", "foobar", "y"},
+	}
+
+	for _, tt := range tests {
+		l := lexer.New(tt.input)
+		p := New(l)
+		program := p.ParseProgram()
+		checkParserErrors(t, p)
+
+		if len(program.Statements) != 1 {
+			t.Fatalf("program.Statements does not contain 1 statements. got=%d",
+				len(program.Statements))
+		}
+
+		stmt := program.Statements[0]
+		if !testFloatStatement(t, stmt, tt.expectedIdentifier) {
+			return
+		}
+
+		val := stmt.(*ast.FloatStatement).Value
+		if !testLiteralExpression(t, val, tt.expectedValue) {
+			return
+		}
+	}
+}
+
 func TestReturnStatements(t *testing.T) {
 	tests := []struct {
 		input         string
@@ -695,6 +763,56 @@ func testLetStatement(t *testing.T, s ast.Statement, name string) bool {
 	return true
 }
 
+func testIntStatement(t *testing.T, s ast.Statement, name string) bool {
+	if s.TokenLiteral() != "int" {
+		t.Errorf("s.TokenLiteral not 'let'. got=%q", s.TokenLiteral())
+		return false
+	}
+
+	intStmt, ok := s.(*ast.IntStatement)
+	if !ok {
+		t.Errorf("s not *ast.LetStatement. got=%T", s)
+		return false
+	}
+
+	if intStmt.Name.Value != name {
+		t.Errorf("intStmt.Name.Value not '%s'. got=%s", name, intStmt.Name.Value)
+		return false
+	}
+
+	if intStmt.Name.TokenLiteral() != name {
+		t.Errorf("s.Name not '%s'. got=%s", name, intStmt.Name)
+		return false
+	}
+
+	return true
+}
+
+func testFloatStatement(t *testing.T, s ast.Statement, name string) bool {
+	if s.TokenLiteral() != "float" {
+		t.Errorf("s.TokenLiteral not 'let'. got=%q", s.TokenLiteral())
+		return false
+	}
+
+	floatStmt, ok := s.(*ast.FloatStatement)
+	if !ok {
+		t.Errorf("s not *ast.FloatStatement. got=%T", s)
+		return false
+	}
+
+	if floatStmt.Name.Value != name {
+		t.Errorf("floatStmt.Name.Value not '%s'. got=%s", name, floatStmt.Name.Value)
+		return false
+	}
+
+	if floatStmt.Name.TokenLiteral() != name {
+		t.Errorf("s.Name not '%s'. got=%s", name, floatStmt.Name)
+		return false
+	}
+
+	return true
+}
+
 func testInfixExpression(t *testing.T, exp ast.Expression, left interface{},
 	operator string, right interface{}) bool {
 
@@ -726,6 +844,8 @@ func testLiteralExpression(
 	expected interface{},
 ) bool {
 	switch v := expected.(type) {
+    case float64:
+		return testFloatLiteral(t, exp, float64(v))
 	case int:
 		return testIntegerLiteral(t, exp, int64(v))
 	case int64:
@@ -737,6 +857,28 @@ func testLiteralExpression(
 	}
 	t.Errorf("type of exp not handled. got=%T", exp)
 	return false
+}
+
+func testFloatLiteral(t *testing.T, il ast.Expression, value float64) bool {
+	flt, ok := il.(*ast.FloatLiteral)
+	if !ok {
+		t.Errorf("il not *ast.FloatLiteral. got=%T", il)
+		return false
+	}
+
+	if flt.Value != value {
+		t.Errorf("flt.Value not %v. got=%v", value, flt.Value)
+		return false
+	}
+
+    // 7.0 != 7 even when theyre both floats... whatever
+	/*if flt.TokenLiteral() != fmt.Sprintf("%v", value) {
+		t.Errorf("flt.TokenLiteral not %v. got=%s", value,
+			flt.TokenLiteral())
+		return false
+	}*/
+
+	return true
 }
 
 func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) bool {

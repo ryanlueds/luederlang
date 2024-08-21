@@ -8,7 +8,7 @@ import (
 
 func TestNextToken(t *testing.T) {
 	input := `let five = 5.1234;
-let ten = 10;
+int ten = 10;
 
 let add = fun(x, y) {
   x + y;
@@ -35,12 +35,12 @@ if (5 < 10) {
 		{token.LET, "let"},
 		{token.IDENT, "five"},
 		{token.ASSIGN, "="},
-		{token.FLOAT, "5.1234"},
+		{token.FLOAT_LITERAL, "5.1234"},
 		{token.SEMICOLON, ";"},
-		{token.LET, "let"},
+		{token.INT, "int"},
 		{token.IDENT, "ten"},
 		{token.ASSIGN, "="},
-		{token.INT, "10"},
+		{token.INT_LITERAL, "10"},
 		{token.SEMICOLON, ";"},
 		{token.LET, "let"},
 		{token.IDENT, "add"},
@@ -72,19 +72,19 @@ if (5 < 10) {
 		{token.MINUS, "-"},
 		{token.SLASH, "/"},
 		{token.ASTERISK, "*"},
-		{token.INT, "5"},
+		{token.INT_LITERAL, "5"},
 		{token.SEMICOLON, ";"},
-		{token.INT, "5"},
+		{token.INT_LITERAL, "5"},
 		{token.LT, "<"},
-		{token.INT, "10"},
+		{token.INT_LITERAL, "10"},
 		{token.GT, ">"},
-		{token.INT, "5"},
+		{token.INT_LITERAL, "5"},
 		{token.SEMICOLON, ";"},
 		{token.IF, "if"},
 		{token.LPAREN, "("},
-		{token.INT, "5"},
+		{token.INT_LITERAL, "5"},
 		{token.LT, "<"},
-		{token.INT, "10"},
+		{token.INT_LITERAL, "10"},
 		{token.RPAREN, ")"},
 		{token.LBRACE, "{"},
 		{token.RETURN, "return"},
@@ -97,13 +97,13 @@ if (5 < 10) {
 		{token.FALSE, "false"},
 		{token.SEMICOLON, ";"},
 		{token.RBRACE, "}"},
-		{token.INT, "10"},
+		{token.INT_LITERAL, "10"},
 		{token.EQ, "=="},
-		{token.INT, "10"},
+		{token.INT_LITERAL, "10"},
 		{token.SEMICOLON, ";"},
-		{token.INT, "10"},
+		{token.INT_LITERAL, "10"},
 		{token.NOT_EQ, "!="},
-		{token.INT, "9"},
+		{token.INT_LITERAL, "9"},
 		{token.SEMICOLON, ";"},
 		{token.EOF, ""},
 	}

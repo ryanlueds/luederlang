@@ -7,12 +7,14 @@ import (
 	"luederlang/lexer"
 	"luederlang/parser"
     "luederlang/evaluator"
+    "luederlang/object"
 )
 
 const PROMPT = ">> "
 
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
+    env := object.NewEnvironment()
 
 	for {
 		fmt.Printf(PROMPT)
@@ -31,7 +33,7 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-        eval := evaluator.Eval(program)
+        eval := evaluator.Eval(program, env)
         if eval != nil {
             io.WriteString(out, eval.Inspect())
             io.WriteString(out, "\n")

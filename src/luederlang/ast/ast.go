@@ -45,6 +45,54 @@ func (p *Program) String() string {
     return out.String()
 }
 
+type IntStatement struct {
+    Token token.Token
+    Name *Identifier
+    Value Expression
+}
+
+func (is *IntStatement) statementNode() {}
+func (is *IntStatement) TokenLiteral() string { return is.Token.Literal }
+func (is *IntStatement) String() string {
+    var out bytes.Buffer
+
+    out.WriteString(is.TokenLiteral() + " ")
+    out.WriteString(is.Name.String())
+    out.WriteString(" = ")
+
+    if is.Value != nil {
+        out.WriteString(is.Value.String())
+    }
+
+    out.WriteString(";")
+    
+    return out.String()
+}
+
+type FloatStatement struct {
+    Token token.Token
+    Name *Identifier
+    Value Expression
+}
+
+func (fs *FloatStatement) statementNode() {}
+func (fs *FloatStatement) TokenLiteral() string { return fs.Token.Literal }
+func (fs *FloatStatement) String() string {
+    var out bytes.Buffer
+
+    out.WriteString(fs.TokenLiteral() + " ")
+    out.WriteString(fs.Name.String())
+    out.WriteString(" = ")
+
+    if fs.Value != nil {
+        out.WriteString(fs.Value.String())
+    }
+
+    out.WriteString(";")
+    
+    return out.String()
+}
+
 type LetStatement struct {
     Token token.Token
     Name *Identifier
@@ -226,7 +274,7 @@ func (ie *IfExpression) String() string {
 }
 
 type FunctionLiteral struct {
-	Token      token.Token // The 'fn' token
+	Token      token.Token // The fun token
 	Parameters []*Identifier
 	Body       *BlockStatement
 }
@@ -272,4 +320,28 @@ func (ce *CallExpression) String() string {
 	out.WriteString(")")
 
 	return out.String()
+}
+
+type AssignStatement struct {
+    Token token.Token
+    Name *Identifier
+    Value Expression
+}
+
+func (as *AssignStatement) statementNode() {}
+func (as *AssignStatement) TokenLiteral() string { return as.Token.Literal }
+func (as *AssignStatement) String() string {
+    var out bytes.Buffer
+
+    out.WriteString(as.TokenLiteral() + " ")
+    out.WriteString(as.Name.String())
+    out.WriteString(" = ")
+
+    if as.Value != nil {
+        out.WriteString(as.Value.String())
+    }
+
+    out.WriteString(";")
+    
+    return out.String()
 }

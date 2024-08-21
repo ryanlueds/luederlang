@@ -22,6 +22,7 @@ const (
 var precedences = map[token.TokenType]int{
 	token.EQ:       EQUALS,
 	token.NOT_EQ:   EQUALS,
+    token.ASSIGN:   EQUALS,
 	token.LT:       LESSGREATER,
 	token.GT:       LESSGREATER,
 	token.PLUS:     SUM,
@@ -55,8 +56,8 @@ func New(l *lexer.Lexer) *Parser {
 
     p.prefixParseFns = make(map[token.TokenType]prefixParseFn)
     p.registerPrefix(token.IDENT, p.parseIdentifier)
-    p.registerPrefix(token.INT, p.parseIntLiteral)
-    p.registerPrefix(token.FLOAT, p.parseFloatLiteral)
+    p.registerPrefix(token.INT_LITERAL, p.parseIntLiteral)
+    p.registerPrefix(token.FLOAT_LITERAL, p.parseFloatLiteral)
     p.registerPrefix(token.BANG, p.parsePrefixExpression)
     p.registerPrefix(token.MINUS, p.parsePrefixExpression)
     p.registerPrefix(token.TRUE, p.parseBoolean)
@@ -159,13 +160,89 @@ func (p *Parser) ParseProgram() *ast.Program {
 
 func (p *Parser) parseStatement() ast.Statement {
 	switch p.curToken.Type {
-	case token.LET:
+    case token.LET:
 		return p.parseLetStatement()
+    case token.INT:
+		return p.parseIntStatement()
+    case token.FLOAT:
+		return p.parseFloatStatement()
 	case token.RETURN:
 		return p.parseReturnStatement()
+    case token.IDENT:
+        return p.parseAssignStatement()
 	default:
 		return p.parseExpressionStatement()
 	}
+}
+
+func (p *Parser) parseAssignStatement() ast.Statement {
+    var stmt ast.Statement
+    identToken := p.curToken
+
+	if !p.peekTokenIs(token.ASSIGN) {
+	    return p.parseExpressionStatement()
+	}
+
+    p.nextToken() // after this line: p.curToken -> '='
+    p.nextToken() // after this line: p.curToken -> expression
+
+	stmt = &ast.LetStatement{Token: identToken}
+	stmt.(*ast.LetStatement).Name = &ast.Identifier{Token: identToken, Value: identToken.Literal}
+    stmt.(*ast.LetStatement).Value = p.parseExpression(LOWEST) 
+
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return stmt
+}
+
+func (p *Parser) parseIntStatement() *ast.IntStatement {
+	stmt := &ast.IntStatement{Token: p.curToken}
+
+	if !p.expectPeek(token.IDENT) {
+		return nil
+	}
+
+	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+
+	if !p.expectPeek(token.ASSIGN) {
+		return nil
+	}
+
+	p.nextToken()
+
+	stmt.Value = p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return stmt
+}
+
+func (p *Parser) parseFloatStatement() *ast.FloatStatement {
+	stmt := &ast.FloatStatement{Token: p.curToken}
+
+	if !p.expectPeek(token.IDENT) {
+		return nil
+	}
+
+	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+
+	if !p.expectPeek(token.ASSIGN) {
+		return nil
+	}
+
+	p.nextToken()
+
+	stmt.Value = p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return stmt
 }
 
 func (p *Parser) parseLetStatement() *ast.LetStatement {
@@ -185,7 +262,6 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 
 	stmt.Value = p.parseExpression(LOWEST)
 
-    // TODO: Maybe remove this to enfore semicolons :D
 	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}

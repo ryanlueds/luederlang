@@ -11,9 +11,9 @@ const (
 	EOF     = "EOF"
 
 	// Identifiers + literals
-	IDENT = "IDENT" // add, foobar, x, y, ...
-	INT   = "INT"   // 1343456
-    FLOAT = "FLOAT"
+	IDENT = "IDENT"                 // add, foobar, x, y, ...
+    INT_LITERAL   = "INT_LITERAL"   // 1343456
+    FLOAT_LITERAL = "FLOAT_LITERAL"
 
 	// Operators
 	ASSIGN   = "="
@@ -41,6 +41,9 @@ const (
 	// Keywords
 	FUNCTION = "FUNCTION"
 	LET      = "LET"
+    INT      = "INT"
+    FLOAT    = "FLOAT" 
+    BOOL     = "BOOL"
 	TRUE     = "TRUE"
 	FALSE    = "FALSE"
 	IF       = "IF"
@@ -56,6 +59,8 @@ type Token struct {
 var keywords = map[string]TokenType{
 	"fun":    FUNCTION,
 	"let":    LET,
+    "int":    INT,
+    "float":  FLOAT,
 	"true":   TRUE,
 	"false":  FALSE,
 	"if":     IF,
@@ -75,9 +80,9 @@ func LookupNumber(number string) TokenType {
     var tok TokenType
     switch count {
     case 0:
-        tok = INT
+        tok = INT_LITERAL
     case 1:
-        tok = FLOAT
+        tok = FLOAT_LITERAL
     default:
         tok = ILLEGAL
     }
