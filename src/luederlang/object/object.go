@@ -72,7 +72,7 @@ type Function struct {
     Env *Environment
 }
 
-func (f *Function) Type() ObjectType { return ERROR_OBJ }
+func (f *Function) Type() ObjectType { return FUNCTION_OBJ }
 func (f *Function) Inspect() string {
 	var out bytes.Buffer
 

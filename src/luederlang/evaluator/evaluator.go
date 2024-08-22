@@ -32,6 +32,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
         if len(args) == 1 && isError(args[0]) {
             return args[0]
         }
+        return applyFunction(function, args)
 
     case *ast.LetStatement:
         val := Eval(node.Value, env)
@@ -102,6 +103,34 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
         return &object.ReturnValue{Value: val}
     }
     return NULL
+}
+
+func applyFunction(function object.Object, args []object.Object) object.Object {
+    f, ok := function.(*object.Function)
+    if !ok {
+        return newError("not a function: %s", function.Type())
+    }
+    extendedEnv := extendFunctionEnv(f, args)
+    evaluated := Eval(f.Body, extendedEnv)
+    return unwrapReturnValue(evaluated)
+}
+
+func extendFunctionEnv(function *object.Function, args []object.Object) *object.Environment {
+    env := object.NewEnclosedEnvironment(function.Env)
+
+    for i, param := range function.Parameters {
+        env.Set(param.Value, args[i])
+    }
+
+    return env
+}
+
+func unwrapReturnValue(obj object.Object) object.Object {
+    if returnValue, ok := obj.(*object.ReturnValue); ok {
+        return returnValue.Value
+    }
+
+    return obj
 }
 
 func evalExpressions(exps []ast.Expression, env *object.Environment) []object.Object {
@@ -264,7 +293,6 @@ func evalInfixExpression(
     case "!=":
         return evalNotEqualsInfixExpression(left, right)
     default:
-        fmt.Printf("%s = %s", left.Type(), right.Type())
         return newError("How did you even do this... What operator is %s?", operator)
     }
 }

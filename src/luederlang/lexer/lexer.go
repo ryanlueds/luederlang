@@ -1,6 +1,8 @@
 package lexer
 
-import "luederlang/token"
+import (
+    "luederlang/token"
+)
 
 type Lexer struct {
     input           string
@@ -44,7 +46,14 @@ func (l *Lexer) NextToken() token.Token {
             tok = newToken(token.BANG, l.ch)
         }
     case '/':
-        tok = newToken(token.SLASH, l.ch)
+        if l.peekChar() == '/' {
+            for l.ch != '\n' && l.ch != '\r' && l.ch != '\t' && l.ch != 0 {
+                l.readChar()
+            }
+            return l.NextToken()
+        } else {
+            tok = newToken(token.SLASH, l.ch)
+        }
     case '*':
         tok = newToken(token.ASTERISK, l.ch)
     case '<':
