@@ -345,3 +345,20 @@ func TestFunctionApplication(t *testing.T) {
 		testIntegerObject(t, testEval(tt.input), tt.expected, tt.input)
 	}
 }
+
+func TestEnclosingEnvironments(t *testing.T) {
+	input := `
+let first = 10;
+let second = 10;
+let third = 10;
+
+let ourFunction = fun(first) {
+  let second = 20;
+
+  first + second + third;
+};
+
+ourFunction(20) + first + second;`
+
+	testIntegerObject(t, testEval(input), 70, "It's one test")
+}
