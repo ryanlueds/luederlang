@@ -23,12 +23,15 @@ const (
 	BANG     = "!"
 	ASTERISK = "*"
 	SLASH    = "/"
+    MOD      = "%"
 
 	LT = "<"
 	GT = ">"
 
 	EQ     = "=="
 	NOT_EQ = "!="
+    LAND   = "&&"
+    LOR    = "||"
 
 	// Delimiters
 	COMMA     = ","

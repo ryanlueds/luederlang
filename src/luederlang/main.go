@@ -30,12 +30,7 @@ func executeFile(file string) {
         return
     }
 
-    eval := evaluator.Eval(program, env)
-    // TODO: Delete this
-    if eval != nil {
-        io.WriteString(os.Stdout, eval.Inspect())
-        io.WriteString(os.Stdout, "\n")
-    }
+    evaluator.Eval(program, env)
 }
 
 func main() {

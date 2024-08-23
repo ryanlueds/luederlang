@@ -2,6 +2,7 @@ package lexer
 
 import (
 	"luederlang/token"
+    "fmt"
 )
 
 type Lexer struct {
@@ -23,6 +24,22 @@ func (l *Lexer) NextToken() token.Token {
 	l.eatWhitespace()
 
 	switch l.ch {
+    case '&':
+        if l.peekChar() == '&' {
+            ch := l.ch
+            l.readChar()
+            literal := string(ch) + string(l.ch)
+            tok = token.Token{Type: token.LAND, Literal: literal}
+        }
+
+    case '|':
+        if l.peekChar() == '|' {
+            ch := l.ch
+            l.readChar()
+            literal := string(ch) + string(l.ch)
+            tok = token.Token{Type: token.LAND, Literal: literal}
+        }
+
 	case '"':
         tok.Type = token.STRING_LITERAL
         tok.Literal = l.readString()
@@ -71,6 +88,9 @@ func (l *Lexer) NextToken() token.Token {
 
 	case '>':
 		tok = newToken(token.GT, l.ch)
+
+    case '%':
+        tok = newToken(token.MOD, l.ch)
 
 	case ';':
 		tok = newToken(token.SEMICOLON, l.ch)

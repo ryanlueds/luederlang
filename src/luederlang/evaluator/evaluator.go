@@ -300,6 +300,17 @@ func evalInfixExpression(
         return evalEqualsInfixExpression(left, right)
     case "!=":
         return evalNotEqualsInfixExpression(left, right)
+    case "&&":
+        return evalAndInfixExpression(left, right)
+    case "||":
+        return evalOrInfixExpression(left, right)
+    case "%":
+        if left.Type() != object.INTEGER_OBJ && right.Type() != object.INTEGER_OBJ {
+            return newError("type mismatch: %s %s %s", left.Type(), operator, right.Type())
+        }
+        leftVal := left.(*object.Integer).Value
+        rightVal := right.(*object.Integer).Value
+		return &object.Integer{Value: ((leftVal % rightVal) + rightVal) % rightVal}
     default:
         return newError("How did you even do this... What operator is %s?", operator)
     }
@@ -526,3 +537,16 @@ func evalNotEqualsInfixExpression(left, right object.Object) object.Object {
     return newError("type mismatch: %s != %s", left.Type(), right.Type())
 }
 
+func evalAndInfixExpression(left, right object.Object) object.Object {
+    if left.Type() == object.BOOLEAN_OBJ && right.Type() == object.BOOLEAN_OBJ {
+        return nativeBoolToBooleanObject(left.(*object.Boolean).Value && right.(*object.Boolean).Value)
+    }
+    return newError("type mismatch: %s && %s", left.Type(), right.Type())
+}
+
+func evalOrInfixExpression(left, right object.Object) object.Object {
+    if left.Type() == object.BOOLEAN_OBJ && right.Type() == object.BOOLEAN_OBJ {
+        return nativeBoolToBooleanObject(left.(*object.Boolean).Value || right.(*object.Boolean).Value)
+    }
+    return newError("type mismatch: %s && %s", left.Type(), right.Type())
+}
