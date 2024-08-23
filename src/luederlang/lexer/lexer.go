@@ -2,7 +2,6 @@ package lexer
 
 import (
 	"luederlang/token"
-    "fmt"
 )
 
 type Lexer struct {
