@@ -2,7 +2,8 @@
 ## About:
 Luederlang is an interpreted language written in Go. Largely inspired
 by [Thorsten Ball's implementation](https://interpreterbook.com/) with key changes.
-Incredibly minimal to fit the hard deadline of the school semester starting.
+Incredibly minimal to fit the hard deadline of the school semester starting. I 
+like naming things after myself, and Luederlang was too good of a name to pass up.
 ## Specs
 - Lexer (A5 Military Grade Wagyu)
 - Parser (Top Down Operator Precedence / Pratt Parser)
