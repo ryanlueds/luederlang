@@ -24,6 +24,7 @@ const (
     RETURN_VALUE_OBJ = "RETURN_VALUE"
     ERROR_OBJ = "ERROR"
     FUNCTION_OBJ = "FUNCTION"
+    BUILTIN_OBJ = "BUILTIN"
 )
 
 type Integer struct {
@@ -32,6 +33,13 @@ type Integer struct {
 
 func (i *Integer) Inspect() string { return fmt.Sprintf("%d", i.Value) }
 func (i *Integer) Type() ObjectType { return INTEGER_OBJ }
+
+type String struct {
+    Value string
+}
+
+func (s *String) Inspect() string { return s.Value }
+func (s *String) Type() ObjectType { return STRING_OBJ }
 
 type Float struct {
     Value float64
@@ -91,6 +99,14 @@ func (f *Function) Inspect() string {
 	return out.String()
 }
 
+type BuiltinFunction func(args ...Object) Object
+
+type Builtin struct {
+    Function BuiltinFunction
+}
+
+func (bn *Builtin) Type() ObjectType { return BUILTIN_OBJ }
+func (bi *Builtin) Inspect() string { return "built in function" }
 
 
 

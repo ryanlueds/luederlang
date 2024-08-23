@@ -14,6 +14,9 @@ var (
 
 func Eval(node ast.Node, env *object.Environment) object.Object {
     switch node := node.(type) {
+    case *ast.StringLiteral:
+        return &object.String{Value: node.Value}
+
     case *ast.FunctionLiteral:
         params := node.Parameters
         body := node.Body
@@ -106,13 +109,16 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 }
 
 func applyFunction(function object.Object, args []object.Object) object.Object {
-    f, ok := function.(*object.Function)
-    if !ok {
+    switch f := function.(type) {
+    case *object.Function:
+        extendedEnv := extendFunctionEnv(f, args)
+        evaluated := Eval(f.Body, extendedEnv)
+        return unwrapReturnValue(evaluated)
+    case *object.Builtin:
+        return f.Function(args...)
+    default:
         return newError("not a function: %s", function.Type())
     }
-    extendedEnv := extendFunctionEnv(f, args)
-    evaluated := Eval(f.Body, extendedEnv)
-    return unwrapReturnValue(evaluated)
 }
 
 func extendFunctionEnv(function *object.Function, args []object.Object) *object.Environment {
@@ -148,11 +154,13 @@ func evalExpressions(exps []ast.Expression, env *object.Environment) []object.Ob
 }
 
 func evalIdentifier(node *ast.Identifier, env *object.Environment) object.Object {
-    val, ok := env.Get(node.Value)
-    if !ok {
-        return newError("identifier not found: %s", node.Value)
+    if val, ok := env.Get(node.Value); ok {
+        return val
     }
-    return val
+    if builtin, ok := builtins[node.Value]; ok {
+        return builtin
+    }
+    return newError("identifier not found: %s", node.Value)
 }
 
 func newError(format string, a ...interface{}) *object.Error {
@@ -320,6 +328,12 @@ func evalPlusInfixExpression(left, right object.Object) object.Object {
             rightVal := right.(*object.Float).Value
             return &object.Float{Value: leftVal + rightVal}
         }
+    }
+
+    if left.Type() == object.STRING_OBJ && right.Type() == object.STRING_OBJ {
+        leftVal := left.(*object.String).Value
+        rightVal := right.(*object.String).Value
+        return &object.String{Value: leftVal + rightVal}
     }
     return newError("type mismatch: %s + %s", left.Type(), right.Type())
 }

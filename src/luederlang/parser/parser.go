@@ -58,6 +58,7 @@ func New(l *lexer.Lexer) *Parser {
     p.registerPrefix(token.IDENT, p.parseIdentifier)
     p.registerPrefix(token.INT_LITERAL, p.parseIntLiteral)
     p.registerPrefix(token.FLOAT_LITERAL, p.parseFloatLiteral)
+    p.registerPrefix(token.STRING_LITERAL, p.parseStringLiteral)
     p.registerPrefix(token.BANG, p.parsePrefixExpression)
     p.registerPrefix(token.MINUS, p.parsePrefixExpression)
     p.registerPrefix(token.TRUE, p.parseBoolean)
@@ -343,8 +344,14 @@ func (p *Parser) parseIdentifier() ast.Expression {
 	return &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 }
 
+func (p *Parser) parseStringLiteral() ast.Expression {
+	lit := &ast.StringLiteral{Token: p.curToken}
+    lit.Value = p.curToken.Literal
+
+	return lit
+}
+
 func (p *Parser) parseIntLiteral() ast.Expression {
-    // TODO: parse floats here
 	lit := &ast.IntegerLiteral{Token: p.curToken}
 
 	value, err := strconv.ParseInt(p.curToken.Literal, 0, 64)
@@ -360,7 +367,6 @@ func (p *Parser) parseIntLiteral() ast.Expression {
 }
 
 func (p *Parser) parseFloatLiteral() ast.Expression {
-    // TODO: parse floats here
 	lit := &ast.FloatLiteral{Token: p.curToken}
 
 	value, err := strconv.ParseFloat(p.curToken.Literal, 64)

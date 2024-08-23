@@ -362,3 +362,31 @@ ourFunction(20) + first + second;`
 
 	testIntegerObject(t, testEval(input), 70, "It's one test")
 }
+
+func TestStringLiteral(t *testing.T) {
+    input := `"Hello World!"`
+
+    evaluated := testEval(input)
+    str, ok := evaluated.(*object.String)
+    if !ok {
+        t.Fatalf("string is not a string")
+    }
+
+    if str.Value != "Hello World!" {
+        t.Errorf("not hello world")
+    }
+}
+
+func TestStringConcatenation(t *testing.T) {
+	input := `"Hello" + " " + "World!"`
+
+	evaluated := testEval(input)
+	str, ok := evaluated.(*object.String)
+	if !ok {
+		t.Fatalf("object is not String. got=%T (%+v)", evaluated, evaluated)
+	}
+
+	if str.Value != "Hello World!" {
+		t.Errorf("String has wrong value. got=%q", str.Value)
+	}
+}
