@@ -2,6 +2,7 @@ package lexer
 
 import (
 	"luederlang/token"
+    "strings"
 )
 
 type Lexer struct {
@@ -133,12 +134,18 @@ func (l *Lexer) NextToken() token.Token {
 }
 
 func (l *Lexer) readString() string {
-    position := l.position + 1
+    var sb strings.Builder
     l.readChar()
     for l.ch != '"' && l.ch != 0 {
+        if l.ch == '\\' && l.peekChar() == 'n' {
+            sb.WriteString(string('\n'))
+            l.readChar()
+        } else {
+            sb.WriteString(string(l.ch))
+        }
         l.readChar()
     }
-    return l.input[position: l.position]
+    return sb.String()
 }
 
 func (l *Lexer) eatWhitespace() {

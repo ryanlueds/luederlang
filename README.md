@@ -24,22 +24,27 @@ like naming things after myself, and Luederlang was too good of a name to pass u
 ### Fizzbuzz without loops and without else-if's:
 ```
 // ryan.lueder
-int number = 15
+// A little verbose: we dont have loops but we have recursion
+let fizzbuzz = fun(i, n) {
+    if (i > n) {
+        print("\n");
+        return 0;
+    }
 
-if(number % 3 == 0 && number % 5 == 0) {
-    print("fizzbuzz")
-} else {
-    if(number % 3 == 0) {
-        print("fizz")
-    }
-    if(number % 5 == 0) {
-        print("buzz")
-    }
+    // A little verbose: we don't have else-ifs
+    if (i % 3 == 0) { print("fizz"); }
+    if (i % 5 == 0) { print("buzz"); }
+    if (i % 3 != 0 && i % 5 != 0) { print(i); }
+    print(" ");
+
+    fizzbuzz(i + 1, n);
 }
+
+fizzbuzz(1, 30);
 ```
 ```
 ~/ go run main.go ryan.lueder
-fizzbuzz
+1 2 fizz 4 buzz fizz 7 8 fizz buzz 11 fizz 13 14 fizzbuzz 16 17 fizz 19 buzz fizz 22 23 fizz buzz 26 fizz 28 29 fizzbuzz
 ```
 Note that `ryan.lueder` is the entry point for Luederlang files. This is not enforced by the interpreter but IS industry standard and IS largely believed to be best code style.
 
