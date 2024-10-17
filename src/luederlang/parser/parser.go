@@ -14,8 +14,8 @@ const (
     LOGIC
     EQUALS
     LESSGREATER
-    SUM
     PRODUCT
+    SUM
     PREFIX
     CALL
 )
